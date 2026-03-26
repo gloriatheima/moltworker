@@ -59,10 +59,10 @@ function isGatewayCrashedError(error: unknown): boolean {
 }
 
 /**
- * Kill any existing gateway process so ensureMoltbotGateway() starts fresh.
+ * Kill any existing gateway process so ensureGateway() starts fresh.
  */
 async function killExistingGateway(sandbox: Sandbox): Promise<void> {
-  const process = await findExistingMoltbotProcess(sandbox);
+  const process = await findExistingGatewayProcess(sandbox);
   if (process) {
     console.log('[PROXY] Killing crashed gateway process:', process.id);
     try {
