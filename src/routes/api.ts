@@ -248,13 +248,18 @@ adminApi.post('/gateway/restart', async (c) => {
     // Find and kill the existing gateway process
     const existingProcess = await findExistingGatewayProcess(sandbox);
 
-    // Force kill gateway via exec — more reliable than Process.kill() because
-    // the tracked process (start-openclaw.sh) may have forked a child
-    // (openclaw gateway) that survives Process.kill(). (Credit: dalexeenko #261)
+    // Force kill the gateway via exec — more reliable than Process.kill()
+    // because start-openclaw.sh execs into "openclaw" which forks
+    // "openclaw-gateway". Process.kill() only kills the tracked shell PID,
+    // but the forked child keeps port 18789. (Credit: dalexeenko #261)
+    //
+    // The actual process names are "openclaw" and "openclaw-gateway" (hyphenated).
     try {
-      await sandbox.exec('pkill -9 -f "openclaw gateway" 2>/dev/null || true');
+      await sandbox.exec(
+        'kill -9 $(pgrep -x "openclaw-gateway" 2>/dev/null) $(pgrep -x "openclaw" 2>/dev/null) 2>/dev/null; true',
+      );
     } catch {
-      // Process may not exist
+      // Process may not exist or pgrep not available
     }
 
     // Also kill via the Process API for completeness
@@ -270,16 +275,18 @@ adminApi.post('/gateway/restart', async (c) => {
     // Clean up lock files that prevent restart
     try {
       await sandbox.exec(
-        'rm -f /tmp/openclaw-gateway.lock /root/.openclaw/gateway.lock 2>/dev/null || true',
+        'rm -f /tmp/openclaw-gateway.lock /root/.openclaw/gateway.lock /home/openclaw/.openclaw/gateway.lock 2>/dev/null; true',
       );
     } catch {
       // Ignore
     }
 
-    // Wait for process to fully die and verify
-    await new Promise((r) => setTimeout(r, 3000));
+    // Wait for process to fully die and verify port is free
+    await new Promise((r) => setTimeout(r, 2000));
     try {
-      const check = await sandbox.exec('pgrep -f "openclaw gateway" || echo "dead"');
+      const check = await sandbox.exec(
+        'pgrep -x "openclaw-gateway" && echo "STILL ALIVE" || echo "dead"',
+      );
       console.log('[Restart] Process check after kill:', check.stdout?.trim());
     } catch {
       // Ignore

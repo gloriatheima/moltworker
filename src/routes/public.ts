@@ -37,19 +37,25 @@ publicRoutes.get('/api/status', async (c) => {
   try {
     let process = await findExistingGatewayProcess(sandbox);
     if (!process) {
-      // No gateway process found — start it synchronously.
-      // The loading page polls /api/status, so this ensures the gateway
-      // eventually starts even if the initial waitUntil from the catch-all
-      // route didn't fire (e.g., due to DO execution context limitations).
+      // No gateway process found — start it with a short timeout.
+      // The loading page polls /api/status every few seconds, so even
+      // if this attempt times out, subsequent polls will retry.
+      const QUICK_START_TIMEOUT = 30_000;
       try {
-        await ensureGateway(sandbox, c.env);
+        await Promise.race([
+          ensureGateway(sandbox, c.env),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Gateway start timeout')), QUICK_START_TIMEOUT),
+          ),
+        ]);
         process = await findExistingGatewayProcess(sandbox);
       } catch (err: unknown) {
-        console.error('[api/status] Gateway start failed:', err);
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error('[api/status] Gateway start failed/timeout:', msg);
         return c.json({
           ok: false,
-          status: 'start_failed',
-          error: err instanceof Error ? err.message : String(err),
+          status: msg.includes('timeout') ? 'starting' : 'start_failed',
+          error: msg,
         });
       }
       if (!process) {
