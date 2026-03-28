@@ -72,12 +72,16 @@ sync workspace with marker file
 %require
 ===
 WORKER_URL=$(cat "$CCTR_FIXTURE_DIR/worker-url.txt")
-./curl-auth -s -X POST "$WORKER_URL/api/admin/storage/sync" | jq .
+RESULT=$(./curl-auth -s -X POST "$WORKER_URL/api/admin/storage/sync")
+echo "$RESULT" | jq .
+# The debug field shows mount state and dir contents at sync time.
+# If dirContents doesn't include e2e-marker.txt, the backup won't have it.
 ---
 {{ result: json object }}
 ---
 where
 * result.success == true
+* result.debug.dirContents contains "e2e-marker.txt"
 
 ===
 delete marker file locally and confirm gone
@@ -129,14 +133,18 @@ verify marker file restored from R2 after restart
 %require
 ===
 WORKER_URL=$(cat "$CCTR_FIXTURE_DIR/worker-url.txt")
-for i in $(seq 1 6); do
-    RESPONSE=$(./curl-auth -s "$WORKER_URL/debug/cli?cmd=cat+/home/openclaw/clawd/e2e-marker.txt" 2>/dev/null || echo "")
-    if echo "$RESPONSE" | jq -r '.stdout // empty' 2>/dev/null | grep -q "e2e-persistence-test"; then
-        echo "$RESPONSE" | jq .
-        exit 0
-    fi
-    sleep 5
-done
+# Single comprehensive check: mount state, dir listing, and marker content
+RESPONSE=$(./curl-auth -s "$WORKER_URL/debug/cli?cmd=echo+MOUNT_STATE:+%26%26+(mount+%7C+grep+openclaw+%7C%7C+echo+NO_OVERLAY)+%26%26+echo+DIR_LISTING:+%26%26+ls+/home/openclaw/clawd/+%26%26+echo+MARKER_CONTENT:+%26%26+cat+/home/openclaw/clawd/e2e-marker.txt+2>%261" 2>/dev/null || echo "")
+# If marker not found, retry a few times
+if ! echo "$RESPONSE" | jq -r '.stdout // empty' 2>/dev/null | grep -q "e2e-persistence-test"; then
+    for i in $(seq 1 5); do
+        sleep 5
+        RESPONSE=$(./curl-auth -s "$WORKER_URL/debug/cli?cmd=echo+MOUNT_STATE:+%26%26+(mount+%7C+grep+openclaw+%7C%7C+echo+NO_OVERLAY)+%26%26+echo+DIR_LISTING:+%26%26+ls+/home/openclaw/clawd/+%26%26+echo+MARKER_CONTENT:+%26%26+cat+/home/openclaw/clawd/e2e-marker.txt+2>%261" 2>/dev/null || echo "")
+        if echo "$RESPONSE" | jq -r '.stdout // empty' 2>/dev/null | grep -q "e2e-persistence-test"; then
+            break
+        fi
+    done
+fi
 echo "$RESPONSE" | jq .
 ---
 {{ result: json object }}
