@@ -21,12 +21,9 @@ function ButtonSpinner() {
 
 function formatSyncTime(isoString: string | null) {
   if (!isoString) return 'Never';
-  try {
-    const date = new Date(isoString);
-    return date.toLocaleString();
-  } catch {
-    return isoString;
-  }
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return isoString;
+  return date.toLocaleString();
 }
 
 function formatTimestamp(ts: number) {
