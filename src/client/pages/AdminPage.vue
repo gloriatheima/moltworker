@@ -146,7 +146,7 @@ async function handleSync() {
     const result = await triggerSync();
     if (result.success) {
       if (storageStatus.value) {
-        storageStatus.value = { ...storageStatus.value, lastSync: result.lastSync || null };
+        storageStatus.value = { ...storageStatus.value, lastBackupId: result.backupId || null };
       }
       error.value = null;
     } else {
@@ -192,7 +192,7 @@ onMounted(async () => {
       <div class="storage-status">
         <div class="storage-info">
           <span>R2 storage is configured. Your data will persist across container restarts.</span>
-          <span class="last-sync">Last backup: {{ formatSyncTime(storageStatus.lastSync) }}</span>
+          <span class="last-sync">Last backup: {{ formatSyncTime(storageStatus.lastBackupId) }}</span>
         </div>
         <button class="btn btn-secondary btn-sm" :disabled="syncInProgress" @click="handleSync">
           <span v-if="syncInProgress" class="btn-spinner" />

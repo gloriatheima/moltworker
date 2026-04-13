@@ -160,7 +160,7 @@ export default function AdminPage() {
       const result = await triggerSync();
       if (result.success) {
         // Update the storage status with new lastSync time
-        setStorageStatus((prev) => (prev ? { ...prev, lastSync: result.lastSync || null } : null));
+        setStorageStatus((prev) => (prev ? { ...prev, lastBackupId: result.backupId || null } : null));
         setError(null);
       } else {
         setError(result.error || 'Sync failed');
@@ -214,7 +214,7 @@ export default function AdminPage() {
                 R2 storage is configured. Your data will persist across container restarts.
               </span>
               <span className="last-sync">
-                Last backup: {formatSyncTime(storageStatus.lastSync)}
+                Last backup: {formatSyncTime(storageStatus.lastBackupId)}
               </span>
             </div>
             <button
