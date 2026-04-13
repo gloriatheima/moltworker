@@ -5,8 +5,8 @@ import AdminPage from './pages/AdminPage.vue';
 <template>
   <div class="app">
     <header class="app-header">
-      <img src="/logo-small.png" alt="Moltworker" class="header-logo" />
-      <h1>Moltbot Admin</h1>
+      <img src="/logo-small.png" alt="openclaw-worker" class="header-logo" />
+      <h1>openclaw admin</h1>
     </header>
     <main class="app-main">
       <AdminPage />
