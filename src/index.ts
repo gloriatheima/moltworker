@@ -11,7 +11,9 @@
  * - Configuration via environment secrets
  *
  * Required secrets (set via `wrangler secret put`):
- * - ANTHROPIC_API_KEY: Your Anthropic API key
+ * - CLOUDFLARE_AI_GATEWAY_API_KEY: Provider key for Cloudflare AI Gateway
+ * - CF_AI_GATEWAY_ACCOUNT_ID: Cloudflare account ID
+ * - CF_AI_GATEWAY_GATEWAY_ID: AI Gateway ID
  *
  * Optional secrets:
  * - MOLTBOT_GATEWAY_TOKEN: Token to protect gateway access
@@ -86,19 +88,17 @@ function validateRequiredEnv(env: OpenClawEnv): string[] {
     }
   }
 
-  // Check for AI provider configuration (at least one must be set)
+  // Cloudflare AI Gateway is required in production mode.
+  // (dev/test mode is already skipped above)
   const hasCloudflareGateway = !!(
     env.CLOUDFLARE_AI_GATEWAY_API_KEY &&
     env.CF_AI_GATEWAY_ACCOUNT_ID &&
     env.CF_AI_GATEWAY_GATEWAY_ID
   );
-  const hasLegacyGateway = !!(env.AI_GATEWAY_API_KEY && env.AI_GATEWAY_BASE_URL);
-  const hasAnthropicKey = !!env.ANTHROPIC_API_KEY;
-  const hasOpenAIKey = !!env.OPENAI_API_KEY;
 
-  if (!hasCloudflareGateway && !hasLegacyGateway && !hasAnthropicKey && !hasOpenAIKey) {
+  if (!hasCloudflareGateway) {
     missing.push(
-      'ANTHROPIC_API_KEY, OPENAI_API_KEY, or CLOUDFLARE_AI_GATEWAY_API_KEY + CF_AI_GATEWAY_ACCOUNT_ID + CF_AI_GATEWAY_GATEWAY_ID',
+      'CLOUDFLARE_AI_GATEWAY_API_KEY + CF_AI_GATEWAY_ACCOUNT_ID + CF_AI_GATEWAY_GATEWAY_ID',
     );
   }
 
@@ -140,7 +140,9 @@ app.use('*', async (c, next) => {
   const url = new URL(c.req.url);
   const redactedSearch = redactSensitiveParams(url);
   console.log(`[REQ] ${c.req.method} ${url.pathname}${redactedSearch}`);
-  console.log(`[REQ] Has ANTHROPIC_API_KEY: ${!!c.env.ANTHROPIC_API_KEY}`);
+  console.log(
+    `[REQ] Has Cloudflare AI Gateway creds: ${!!(c.env.CLOUDFLARE_AI_GATEWAY_API_KEY && c.env.CF_AI_GATEWAY_ACCOUNT_ID && c.env.CF_AI_GATEWAY_GATEWAY_ID)}`,
+  );
   console.log(`[REQ] DEV_MODE: ${c.env.DEV_MODE}`);
   console.log(`[REQ] DEBUG_ROUTES: ${c.env.DEBUG_ROUTES}`);
   await next();
@@ -154,7 +156,7 @@ app.use('*', async (c, next) => {
 // including static assets and health checks that don't need the container.
 app.use('*', async (c, next) => {
   const options = buildSandboxOptions(c.env);
-  const sandbox = getSandbox(c.env.Sandbox, 'openclaw', options);
+  const sandbox = getSandbox(c.env.OPENCLAW_SANDBOX, 'openclaw', options);
   c.set('sandbox', sandbox);
 
   // NOTE: restoreIfNeeded is NOT called here in the global middleware.

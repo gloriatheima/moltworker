@@ -3,10 +3,14 @@ import { buildEnvVars } from './env';
 import { createMockEnv } from '../test-utils';
 
 describe('buildEnvVars', () => {
+  const defaultGatewayModel = 'workers-ai/@cf/zai-org/glm-4.7-flash';
+
   it('returns empty object when no env vars set', () => {
     const env = createMockEnv();
     const result = buildEnvVars(env);
-    expect(result).toEqual({});
+    expect(result).toEqual({
+      CF_AI_GATEWAY_MODEL: defaultGatewayModel,
+    });
   });
 
   it('includes ANTHROPIC_API_KEY when set directly', () => {
@@ -138,6 +142,16 @@ describe('buildEnvVars', () => {
     expect(result.CF_AI_GATEWAY_MODEL).toBe('workers-ai/@cf/meta/llama-3.3-70b-instruct-fp8-fast');
   });
 
+  it('uses default CF_AI_GATEWAY_MODEL when not set', () => {
+    const env = createMockEnv({
+      CLOUDFLARE_AI_GATEWAY_API_KEY: 'cf-gw-key',
+      CF_AI_GATEWAY_ACCOUNT_ID: 'my-account-id',
+      CF_AI_GATEWAY_GATEWAY_ID: 'my-gateway-id',
+    });
+    const result = buildEnvVars(env);
+    expect(result.CF_AI_GATEWAY_MODEL).toBe(defaultGatewayModel);
+  });
+
   it('combines all env vars correctly', () => {
     const env = createMockEnv({
       ANTHROPIC_API_KEY: 'sk-key',
@@ -150,6 +164,7 @@ describe('buildEnvVars', () => {
       ANTHROPIC_API_KEY: 'sk-key',
       OPENCLAW_GATEWAY_TOKEN: 'token',
       TELEGRAM_BOT_TOKEN: 'tg',
+      CF_AI_GATEWAY_MODEL: defaultGatewayModel,
     });
   });
 });

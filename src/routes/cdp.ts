@@ -171,7 +171,7 @@ cdp.get('/', async (c) => {
     return c.json({ error: 'Unauthorized' }, 401);
   }
 
-  if (!c.env.BROWSER) {
+  if (!c.env.OPENCLAW_BROWSER) {
     return c.json(
       {
         error: 'Browser Rendering not configured',
@@ -226,7 +226,7 @@ cdp.get('/json/version', async (c) => {
     return c.json({ error: 'Unauthorized' }, 401);
   }
 
-  if (!c.env.BROWSER) {
+  if (!c.env.OPENCLAW_BROWSER) {
     return c.json(
       {
         error: 'Browser Rendering not configured',
@@ -278,7 +278,7 @@ cdp.get('/json/list', async (c) => {
     return c.json({ error: 'Unauthorized' }, 401);
   }
 
-  if (!c.env.BROWSER) {
+  if (!c.env.OPENCLAW_BROWSER) {
     return c.json(
       {
         error: 'Browser Rendering not configured',
@@ -332,7 +332,7 @@ cdp.get('/json', async (c) => {
     return c.json({ error: 'Unauthorized' }, 401);
   }
 
-  if (!c.env.BROWSER) {
+  if (!c.env.OPENCLAW_BROWSER) {
     return c.json(
       {
         error: 'Browser Rendering not configured',
@@ -368,7 +368,7 @@ async function initCDPSession(ws: WebSocket, env: OpenClawEnv): Promise<void> {
   try {
     // Launch browser
     // eslint-disable-next-line import/no-named-as-default-member -- puppeteer.launch() is the standard API
-    const browser = await puppeteer.launch(env.BROWSER!);
+    const browser = await puppeteer.launch(env.OPENCLAW_BROWSER!);
     const page = await browser.newPage();
     const targetId = crypto.randomUUID();
 

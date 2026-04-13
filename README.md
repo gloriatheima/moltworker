@@ -11,7 +11,7 @@ Run [OpenClaw](https://github.com/openclaw/openclaw) (formerly Moltbot, formerly
 ## Requirements
 
 - [Workers Paid plan](https://www.cloudflare.com/plans/developer-platform/) ($5 USD/month) — required for Cloudflare Sandbox containers. Running the container incurs additional compute costs; see [Container Cost Estimate](#container-cost-estimate) below for details.
-- [Anthropic API key](https://console.anthropic.com/) — for Claude access, or you can use AI Gateway's [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
+- Cloudflare AI Gateway configuration (`CLOUDFLARE_AI_GATEWAY_API_KEY`, `CF_AI_GATEWAY_ACCOUNT_ID`, `CF_AI_GATEWAY_GATEWAY_ID`) — required for production
 
 The following Cloudflare features used by this project have free tiers:
 - Cloudflare Access (authentication)
@@ -62,13 +62,14 @@ _Cloudflare Sandboxes are available on the [Workers Paid plan](https://dash.clou
 # Install dependencies
 npm install
 
-# Set your API key (direct Anthropic access)
-npx wrangler secret put ANTHROPIC_API_KEY
+# Set Cloudflare AI Gateway (required in production)
+npx wrangler secret put CLOUDFLARE_AI_GATEWAY_API_KEY
+npx wrangler secret put CF_AI_GATEWAY_ACCOUNT_ID
+npx wrangler secret put CF_AI_GATEWAY_GATEWAY_ID
 
-# Or use Cloudflare AI Gateway instead (see "Optional: Cloudflare AI Gateway" below)
-# npx wrangler secret put CLOUDFLARE_AI_GATEWAY_API_KEY
-# npx wrangler secret put CF_AI_GATEWAY_ACCOUNT_ID
-# npx wrangler secret put CF_AI_GATEWAY_GATEWAY_ID
+# Optional: explicitly set the primary model (defaults to GLM-4.7)
+npx wrangler secret put CF_AI_GATEWAY_MODEL
+# Enter: workers-ai/@cf/zai-org/glm-4.7-flash
 
 # Generate and set a gateway token (required for remote access)
 # Save this token - you'll need it to access the Control UI
@@ -347,9 +348,9 @@ node /root/clawd/skills/cloudflare-browser/scripts/video.js "https://site1.com,h
 
 See `skills/cloudflare-browser/SKILL.md` for full documentation.
 
-## Optional: Cloudflare AI Gateway
+## Cloudflare AI Gateway (Recommended and Required in Production)
 
-You can route API requests through [Cloudflare AI Gateway](https://developers.cloudflare.com/ai-gateway/) for caching, rate limiting, analytics, and cost tracking. OpenClaw has native support for Cloudflare AI Gateway as a first-class provider.
+In production mode, this project requires [Cloudflare AI Gateway](https://developers.cloudflare.com/ai-gateway/) for model routing. You also get caching, rate limiting, analytics, and cost tracking. OpenClaw has native support for Cloudflare AI Gateway as a first-class provider.
 
 AI Gateway acts as a proxy between OpenClaw and your AI provider (e.g., Anthropic). Requests are sent to `https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/anthropic` instead of directly to `api.anthropic.com`, giving you Cloudflare's analytics, caching, and rate limiting. You still need a provider API key (e.g., your Anthropic API key) — the gateway forwards it to the upstream provider.
 
@@ -378,22 +379,43 @@ All three are required. OpenClaw constructs the gateway URL from the account ID 
 npm run deploy
 ```
 
-When Cloudflare AI Gateway is configured, it takes precedence over direct `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`.
+In non-`DEV_MODE` / non-`E2E_TEST_MODE`, the Worker validates these three Gateway variables and returns 503 if any are missing.
+
+### Dynamic Route (Primary GLM, Fallback Kimi)
+
+Configure Dynamic Route in the Cloudflare AI Gateway dashboard so you can visualize the routing graph and fallback behavior.
+
+Recommended setup:
+
+- Primary model: `workers-ai/@cf/zai-org/glm-4.7-flash`
+- Fallback model: `workers-ai/@cf/moonshotai/kimi-k2.5`
+- Fallback triggers: `5xx`, `429`, timeout (tune for your reliability goals)
+
+Suggested steps:
+
+1. Create a Route / Dynamic Route rule in AI Gateway
+2. Set primary to `@cf/zai-org/glm-4.7-flash`
+3. Add fallback target `@cf/moonshotai/kimi-k2.5`
+4. Save and publish
+5. Keep Worker-side `CF_AI_GATEWAY_MODEL=workers-ai/@cf/zai-org/glm-4.7-flash`
+
+With this setup, if GLM-4.7 fails, AI Gateway automatically falls back to Kimi and the route logic is visible in the Cloudflare dashboard.
 
 ### Choosing a Model
 
-By default, AI Gateway uses Anthropic's Claude Sonnet 4.5. To use a different model or provider, set `CF_AI_GATEWAY_MODEL` with the format `provider/model-id`:
+By default, this project uses `workers-ai/@cf/zai-org/glm-4.7-flash`. To use a different primary model or provider, set `CF_AI_GATEWAY_MODEL` with the format `provider/model-id`:
 
 ```bash
 npx wrangler secret put CF_AI_GATEWAY_MODEL
-# Enter: workers-ai/@cf/meta/llama-3.3-70b-instruct-fp8-fast
+# Enter: workers-ai/@cf/zai-org/glm-4.7-flash
 ```
 
 This works with any [AI Gateway provider](https://developers.cloudflare.com/ai-gateway/usage/providers/):
 
 | Provider | Example `CF_AI_GATEWAY_MODEL` value | API key is... |
 |----------|-------------------------------------|---------------|
-| Workers AI | `workers-ai/@cf/meta/llama-3.3-70b-instruct-fp8-fast` | Cloudflare API token |
+| Workers AI | `workers-ai/@cf/zai-org/glm-4.7-flash` | Cloudflare API token |
+| Workers AI (fallback) | `workers-ai/@cf/moonshotai/kimi-k2.5` | Cloudflare API token |
 | OpenAI | `openai/gpt-4o` | OpenAI API key |
 | Anthropic | `anthropic/claude-sonnet-4-5` | Anthropic API key |
 | Groq | `groq/llama-3.3-70b` | Groq API key |
@@ -415,8 +437,8 @@ The previous `AI_GATEWAY_API_KEY` + `AI_GATEWAY_BASE_URL` approach is still supp
 | `CLOUDFLARE_AI_GATEWAY_API_KEY` | Yes* | Your AI provider's API key, passed through the gateway (e.g., your Anthropic API key). Requires `CF_AI_GATEWAY_ACCOUNT_ID` and `CF_AI_GATEWAY_GATEWAY_ID` |
 | `CF_AI_GATEWAY_ACCOUNT_ID` | Yes* | Your Cloudflare account ID (used to construct the gateway URL) |
 | `CF_AI_GATEWAY_GATEWAY_ID` | Yes* | Your AI Gateway ID (used to construct the gateway URL) |
-| `CF_AI_GATEWAY_MODEL` | No | Override default model: `provider/model-id` (e.g. `workers-ai/@cf/meta/llama-3.3-70b-instruct-fp8-fast`). See [Choosing a Model](#choosing-a-model) |
-| `ANTHROPIC_API_KEY` | Yes* | Direct Anthropic API key (alternative to AI Gateway) |
+| `CF_AI_GATEWAY_MODEL` | No | Override primary model. Default: `workers-ai/@cf/zai-org/glm-4.7-flash`. See [Choosing a Model](#choosing-a-model) |
+| `ANTHROPIC_API_KEY` | No | Direct Anthropic API key (recommended only for local experiments) |
 | `ANTHROPIC_BASE_URL` | No | Direct Anthropic API base URL |
 | `OPENAI_API_KEY` | No | OpenAI API key (alternative provider) |
 | `AI_GATEWAY_API_KEY` | No | Legacy AI Gateway API key (deprecated, use `CLOUDFLARE_AI_GATEWAY_API_KEY` instead) |

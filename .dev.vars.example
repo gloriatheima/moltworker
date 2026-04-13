@@ -1,15 +1,21 @@
 # Copy this to .dev.vars and fill in your values
 # .dev.vars is gitignored and used by wrangler dev
 
-# AI Provider (at least one required)
-ANTHROPIC_API_KEY=sk-ant-...
-# OPENAI_API_KEY=sk-...
+# Cloudflare AI Gateway (required in production)
+# The Worker validates these three vars in non-dev mode.
+CLOUDFLARE_AI_GATEWAY_API_KEY=your-provider-api-key
+CF_AI_GATEWAY_ACCOUNT_ID=your-account-id
+CF_AI_GATEWAY_GATEWAY_ID=your-gateway-id
 
-# Cloudflare AI Gateway (alternative to direct provider keys)
-# CLOUDFLARE_AI_GATEWAY_API_KEY=your-provider-api-key
-# CF_AI_GATEWAY_ACCOUNT_ID=your-account-id
-# CF_AI_GATEWAY_GATEWAY_ID=your-gateway-id
-# CF_AI_GATEWAY_MODEL=workers-ai/@cf/meta/llama-3.3-70b-instruct-fp8-fast
+# Primary model sent to AI Gateway.
+# Configure Dynamic Route fallback in AI Gateway UI:
+# primary: workers-ai/@cf/zai-org/glm-4.7-flash
+# fallback: workers-ai/@cf/moonshotai/kimi-k2.5
+CF_AI_GATEWAY_MODEL=workers-ai/@cf/zai-org/glm-4.7-flash
+
+# Optional direct provider keys (kept for local experiments)
+# ANTHROPIC_API_KEY=sk-ant-...
+# OPENAI_API_KEY=sk-...
 
 # Legacy AI Gateway (still supported)
 # AI_GATEWAY_API_KEY=your-key

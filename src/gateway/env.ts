@@ -1,5 +1,7 @@
 import type { OpenClawEnv } from '../types';
 
+const DEFAULT_CF_AI_GATEWAY_MODEL = 'workers-ai/@cf/zai-org/glm-4.7-flash';
+
 /**
  * Build environment variables to pass to the OpenClaw container process
  *
@@ -48,7 +50,7 @@ export function buildEnvVars(env: OpenClawEnv): Record<string, string> {
   if (env.DISCORD_DM_POLICY) envVars.DISCORD_DM_POLICY = env.DISCORD_DM_POLICY;
   if (env.SLACK_BOT_TOKEN) envVars.SLACK_BOT_TOKEN = env.SLACK_BOT_TOKEN;
   if (env.SLACK_APP_TOKEN) envVars.SLACK_APP_TOKEN = env.SLACK_APP_TOKEN;
-  if (env.CF_AI_GATEWAY_MODEL) envVars.CF_AI_GATEWAY_MODEL = env.CF_AI_GATEWAY_MODEL;
+  envVars.CF_AI_GATEWAY_MODEL = env.CF_AI_GATEWAY_MODEL || DEFAULT_CF_AI_GATEWAY_MODEL;
   if (env.CDP_SECRET) envVars.CDP_SECRET = env.CDP_SECRET;
   if (env.WORKER_URL) envVars.WORKER_URL = env.WORKER_URL;
 
