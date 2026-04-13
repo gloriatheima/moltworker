@@ -253,6 +253,8 @@ npx wrangler secret put SANDBOX_SLEEP_AFTER
 - **Restart Gateway**：结束并重启 moltbot gateway 进程
 - **Device Pairing**：查看待批准设备、单个/批量批准、查看已配对设备
 
+`src/client/` 下的管理前端使用 Vue + Vite 构建。
+
 Admin UI 默认需要 Cloudflare Access（本地可用 `DEV_MODE=true`）。
 
 ## 调试端点（Debug Endpoints）

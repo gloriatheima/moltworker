@@ -253,6 +253,8 @@ Access the admin UI at `/_admin/` to:
 - **Restart Gateway** - Kill and restart the moltbot gateway process
 - **Device Pairing** - View pending requests, approve devices individually or all at once, view paired devices
 
+The admin UI frontend in `src/client/` is built with Vue + Vite.
+
 The admin UI requires Cloudflare Access authentication (or `DEV_MODE=true` for local development).
 
 ## Debug Endpoints

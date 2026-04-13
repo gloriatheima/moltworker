@@ -33,7 +33,7 @@
 
 /* Error banner */
 .error-banner {
-  background-color: rgba(239, 68, 68, 0.15);
+  background-color: #fef3f2;
   border: 1px solid var(--error-color);
   border-radius: var(--border-radius);
   padding: 1rem;
@@ -60,7 +60,7 @@
 
 /* Warning banner (R2 not configured) */
 .warning-banner {
-  background-color: rgba(251, 191, 36, 0.15);
+  background-color: #fff7ed;
   border: 1px solid var(--warning-color);
   border-radius: var(--border-radius);
   padding: 1rem;
@@ -87,7 +87,7 @@
 
 /* Success banner (R2 configured) */
 .success-banner {
-  background-color: rgba(74, 222, 128, 0.15);
+  background-color: #ecfdf3;
   border: 1px solid var(--success-color);
   border-radius: var(--border-radius);
   padding: 1rem;
@@ -123,6 +123,7 @@
 /* Section styles */
 .devices-section {
   background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 1.5rem;
   box-shadow: var(--shadow);
@@ -187,7 +188,7 @@
 
 /* Device card */
 .device-card {
-  background-color: var(--bg-color);
+  background-color: var(--surface-hover);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 1rem;
@@ -307,13 +308,13 @@
 }
 
 .btn-secondary {
-  background-color: var(--surface-hover);
+  background-color: #ffffff;
   color: var(--text-primary);
   border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: var(--border-color);
+  background-color: #f3f4f6;
 }
 
 .btn-success {

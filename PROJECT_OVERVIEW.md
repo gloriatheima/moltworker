@@ -95,6 +95,7 @@
 
 - 统一回落到 `index.html`（SPA）
 - 静态资源由公开路由 `/_admin/assets/*` 提供，保证登录重定向链路可用
+- 管理前端位于 `src/client/`，使用 Vue + Vite 构建
 
 ### D. Debug 能力（`src/routes/debug.ts`）
 

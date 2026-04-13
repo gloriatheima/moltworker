@@ -4,7 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Configuration Error - Moltworker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      :root {
+        --cf-orange: #f6821f;
+        --cf-orange-hover: #e07315;
+        --bg: #f5f4f2;
+        --card: #ffffff;
+        --border: #e4e4e0;
+        --text: #1d1d1d;
+        --muted: #6b7280;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -13,167 +29,196 @@
 
       body {
         min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-        font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-        color: #e0e0e0;
-        padding: 20px;
+        background-color: var(--bg);
+        background-image: radial-gradient(rgba(29, 29, 29, 0.08) 0.8px, transparent 0.8px);
+        background-size: 14px 14px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        color: var(--text);
+        padding: 24px;
       }
 
       .container {
-        text-align: center;
-        max-width: 600px;
+        width: 100%;
+        max-width: 840px;
+        margin: 0 auto;
       }
 
-      .logo {
-        width: 200px;
-        height: auto;
-        margin-bottom: 40px;
-      }
-
-      .icon {
-        font-size: 4rem;
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
         margin-bottom: 20px;
       }
 
-      h1 {
-        font-size: 1.5rem;
-        font-weight: 500;
-        margin-bottom: 16px;
-        color: #f87171;
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+      }
+
+      .header h1 {
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+
+      .main-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+        padding: 28px;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .main-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 34px rgba(0, 0, 0, 0.06);
+      }
+
+      .title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--cf-orange);
+        margin-bottom: 10px;
       }
 
       .message {
         font-size: 1rem;
-        color: #a0a0a0;
-        margin-bottom: 30px;
-        line-height: 1.6;
+        line-height: 1.75;
+        color: var(--muted);
+        margin-bottom: 22px;
       }
 
       .error-box {
-        background: rgba(248, 113, 113, 0.1);
-        border: 1px solid rgba(248, 113, 113, 0.3);
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 30px;
+        background: #fff8f2;
+        border: 1px solid #f7d6ba;
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 16px;
         text-align: left;
       }
 
       .error-box h2 {
-        font-size: 0.9rem;
-        color: #f87171;
-        margin-bottom: 12px;
-        font-weight: 500;
+        font-size: 0.8rem;
+        color: var(--cf-orange);
+        margin-bottom: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
 
       .missing-vars {
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        font-size: 0.85rem;
-        color: #fbbf24;
-        background: rgba(0, 0, 0, 0.3);
-        padding: 12px 16px;
-        border-radius: 4px;
+        font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+        font-size: 0.86rem;
+        color: #7f3f06;
+        background: #fff;
+        border: 1px solid #f0ddcc;
+        padding: 12px 14px;
+        border-radius: 8px;
         word-break: break-all;
       }
 
       .instructions {
-        background: rgba(96, 165, 250, 0.1);
-        border: 1px solid rgba(96, 165, 250, 0.3);
-        border-radius: 8px;
-        padding: 20px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 18px;
         text-align: left;
       }
 
       .instructions h2 {
-        font-size: 0.9rem;
-        color: #60a5fa;
-        margin-bottom: 12px;
-        font-weight: 500;
+        font-size: 0.8rem;
+        color: var(--text);
+        margin-bottom: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
 
       .instructions p {
-        font-size: 0.85rem;
-        color: #a0a0a0;
+        font-size: 0.92rem;
+        color: var(--muted);
         margin-bottom: 12px;
-        line-height: 1.5;
+        line-height: 1.7;
       }
 
       .instructions code {
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        font-size: 0.8rem;
-        background: rgba(0, 0, 0, 0.3);
+        font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+        font-size: 0.82rem;
+        background: #fff7ed;
         padding: 2px 6px;
-        border-radius: 3px;
-        color: #4ade80;
+        border-radius: 4px;
+        color: #7f3f06;
       }
 
       .instructions pre {
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        font-size: 0.8rem;
-        background: rgba(0, 0, 0, 0.3);
+        font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+        font-size: 0.84rem;
+        background: #f8fafc;
+        border: 1px solid var(--border);
         padding: 12px 16px;
-        border-radius: 4px;
-        color: #4ade80;
+        border-radius: 8px;
+        color: var(--text);
         overflow-x: auto;
         margin-top: 8px;
       }
 
       .instructions a {
-        color: rgb(244, 129, 32);
+        color: var(--cf-orange);
         text-decoration: none;
+        font-weight: 600;
       }
 
       .instructions a:hover {
         text-decoration: underline;
+        color: var(--cf-orange-hover);
       }
 
-      .info {
-        font-size: 0.8rem;
-        color: #707070;
-        margin-top: 30px;
-      }
+      @media (max-width: 640px) {
+        .main-card {
+          padding: 20px;
+        }
 
-      .info a {
-        color: rgb(244, 129, 32);
-        text-decoration: none;
-      }
-
-      .info a:hover {
-        text-decoration: underline;
+        .title {
+          font-size: 1.45rem;
+        }
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <img src="/logo.png" alt="Moltworker" class="logo" />
-
-      <h1>Configuration Required</h1>
-
-      <p class="message">
-        Moltworker cannot start because required environment variables are not configured.
-      </p>
-
-      <div class="error-box">
-        <h2>Missing Variables</h2>
-        <div class="missing-vars">{{MISSING_VARS}}</div>
+      <div class="header">
+        <img src="/logo.png" alt="Moltworker" class="logo" />
+        <h1>OpenClaw on Workers</h1>
       </div>
 
-      <div class="instructions">
-        <h2>How to Fix</h2>
-        <p>Set the missing secrets using the Wrangler CLI:</p>
-        <pre>wrangler secret put &lt;VARIABLE_NAME&gt;</pre>
-        <p style="margin-top: 16px">
-          For example: <code>wrangler secret put ANTHROPIC_API_KEY</code>
+      <div class="main-card">
+        <h2 class="title">Configuration Required</h2>
+        <p class="message">
+          Moltworker cannot start because required environment variables are missing.
         </p>
-        <p style="margin-bottom: 0">
-          After setting the secrets, refresh this page to continue. See the
-          <a href="https://github.com/cloudflare/moltworker" target="_blank">README</a> for full
-          setup instructions.
-        </p>
+
+        <div class="error-box">
+          <h2>Missing Variables</h2>
+          <div class="missing-vars">{{MISSING_VARS}}</div>
+        </div>
+
+        <div class="instructions">
+          <h2>How to Fix</h2>
+          <p>Set the missing secrets using Wrangler CLI:</p>
+          <pre>wrangler secret put &lt;VARIABLE_NAME&gt;</pre>
+          <p style="margin-top: 16px">
+            Example: <code>wrangler secret put CLOUDFLARE_AI_GATEWAY_API_KEY</code>
+          </p>
+          <p style="margin-bottom: 0">
+            After setting all secrets, refresh this page. See
+            <a href="https://github.com/cloudflare/moltworker" target="_blank">README</a>
+            for full setup instructions.
+          </p>
+        </div>
       </div>
     </div>
   </body>

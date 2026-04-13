@@ -4,7 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Loading - Moltworker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      :root {
+        --cf-orange: #f6821f;
+        --cf-orange-hover: #e07315;
+        --bg: #f5f4f2;
+        --card: #ffffff;
+        --border: #e4e4e0;
+        --text: #1d1d1d;
+        --muted: #6b7280;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -13,26 +29,57 @@
 
       body {
         min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-        font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-        color: #e0e0e0;
-        padding: 20px;
+        background-color: var(--bg);
+        background-image: radial-gradient(rgba(29, 29, 29, 0.08) 0.8px, transparent 0.8px);
+        background-size: 14px 14px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        color: var(--text);
+        padding: 24px;
       }
 
       .container {
-        text-align: center;
-        max-width: 500px;
+        width: 100%;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 20px;
       }
 
       .logo {
-        width: 200px;
-        height: auto;
-        margin-bottom: 40px;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+      }
+
+      .header h1 {
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .main-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+        padding: 28px;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .main-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 34px rgba(0, 0, 0, 0.06);
+      }
+
+      .brand-logo {
+        width: 180px;
+        margin: 0 auto 20px;
+        display: block;
         animation: pulse 2s ease-in-out infinite;
       }
 
@@ -48,38 +95,37 @@
         }
       }
 
-      h1 {
-        font-size: 1.5rem;
-        font-weight: 500;
-        margin-bottom: 16px;
-        color: #ffffff;
+      .spinner-container h2 {
+        margin: 0;
+        font-size: 1.6rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--cf-orange);
       }
 
       .status {
-        font-size: 0.9rem;
-        color: #a0a0a0;
-        margin-bottom: 30px;
+        font-size: 1rem;
+        line-height: 1.75;
+        color: var(--muted);
+        margin-bottom: 18px;
       }
 
       .spinner-container {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         gap: 12px;
-        margin-bottom: 20px;
-      }
-
-      .spinner-container h1 {
-        margin: 0;
+        margin-bottom: 14px;
       }
 
       .spinner {
-        width: 24px;
-        height: 24px;
-        border: 3px solid rgba(255, 255, 255, 0.1);
-        border-top-color: #60a5fa;
+        width: 22px;
+        height: 22px;
+        border: 3px solid #f4dcc5;
+        border-top-color: var(--cf-orange);
         border-radius: 50%;
         animation: spin 1s linear infinite;
+        flex-shrink: 0;
       }
 
       @keyframes spin {
@@ -115,39 +161,63 @@
       }
 
       .info {
-        font-size: 0.8rem;
-        color: #707070;
-        margin-top: 40px;
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-top: 12px;
+        border-top: 1px dashed var(--border);
+        padding-top: 12px;
       }
 
       .error {
-        color: #f87171;
-        margin-top: 20px;
-        padding: 12px 20px;
-        background: rgba(248, 113, 113, 0.1);
-        border-radius: 8px;
+        color: #8a3f00;
+        margin-top: 14px;
+        padding: 12px 14px;
+        background: #fff7ed;
+        border: 1px solid #ffd5b3;
+        border-radius: 10px;
         display: none;
       }
 
       .ready {
-        color: #4ade80;
+        color: var(--cf-orange);
+      }
+
+      @media (max-width: 640px) {
+        .main-card {
+          padding: 20px;
+        }
+
+        .brand-logo {
+          width: 150px;
+        }
+
+        .spinner-container h2 {
+          font-size: 1.3rem;
+        }
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <img src="/logo.png" alt="Moltworker" class="logo" />
-
-      <div class="spinner-container">
-        <div class="spinner"></div>
-        <h1 id="title">Waiting for Moltworker to load</h1>
+      <div class="header">
+        <img src="/logo.png" alt="Moltworker" class="logo" />
+        <h1>OpenClaw on Workers</h1>
       </div>
 
-      <p class="status" id="status">Starting container...</p>
+      <div class="main-card">
+        <img src="/logo.png" alt="Moltworker" class="brand-logo" />
 
-      <p class="error" id="error"></p>
+        <div class="spinner-container">
+          <div class="spinner"></div>
+          <h2 id="title">Waiting for OpenClaw to boot</h2>
+        </div>
 
-      <p class="info">This usually takes 1-2 minutes on cold start</p>
+        <p class="status" id="status">Starting container...</p>
+
+        <p class="error" id="error"></p>
+
+        <p class="info">Cold starts usually take 1-2 minutes</p>
+      </div>
     </div>
 
     <script>
