@@ -63,7 +63,7 @@ function isGatewayCrashedError(error: unknown): boolean {
 
 // killGateway is imported from './gateway' (shared with restart handler)
 
-export { Sandbox };
+export { Sandbox as OpenclawSandbox };
 
 /**
  * Validate required environment variables.
