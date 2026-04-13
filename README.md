@@ -21,7 +21,7 @@ The following Cloudflare features used by this project have free tiers:
 
 ## Container Cost Estimate
 
-This project uses a `standard-1` Cloudflare Container instance (1/2 vCPU, 4 GiB memory, 8 GB disk). Below are approximate monthly costs assuming the container runs 24/7, based on [Cloudflare Containers pricing](https://developers.cloudflare.com/containers/pricing/):
+This project currently defaults to a `standard-2` Cloudflare Container instance for better performance. The cost table below is a rough `standard-1` baseline reference assuming 24/7 runtime (see [Cloudflare Containers pricing](https://developers.cloudflare.com/containers/pricing/) for exact `standard-2` pricing):
 
 | Resource | Provisioned | Monthly Usage | Included Free | Overage | Approx. Cost |
 |----------|-------------|---------------|---------------|---------|--------------|
@@ -233,9 +233,11 @@ Without R2 credentials, moltbot still works but uses ephemeral storage (data los
 
 ## Container Lifecycle
 
-By default, the sandbox container stays alive indefinitely (`SANDBOX_SLEEP_AFTER=never`). This is recommended because cold starts take 1-2 minutes.
+This repo is configured for higher performance with `SANDBOX_SLEEP_AFTER=24h` in `wrangler.jsonc`, keeping containers warm longer and reducing cold starts.
 
-To reduce costs for infrequently used deployments, you can configure the container to sleep after a period of inactivity:
+The default cron prewarm schedule is every 5 minutes (`*/5 * * * *`) to keep startup latency lower.
+
+To reduce costs for infrequently used deployments, lower the sleep timeout (or set `never` if you prefer always-on behavior):
 
 ```bash
 npx wrangler secret put SANDBOX_SLEEP_AFTER

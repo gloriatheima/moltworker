@@ -143,6 +143,7 @@
 - CLI 耗时常见 10~15s，需等待进程完成（本项目用 `waitForProcess`）
 - 成功文案匹配注意大小写（`Approved`，建议 case-insensitive）
 - 本地 `wrangler dev` 对 WebSocket 代理有已知限制，完整链路建议以线上环境验证
+- 当前高性能默认：`standard-2` + `SANDBOX_SLEEP_AFTER=24h` + `*/5 * * * *` 预热 cron
 
 ---
 

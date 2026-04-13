@@ -16,12 +16,12 @@
 本项目使用到的以下 Cloudflare 功能提供免费额度：
 - Cloudflare Access（身份认证）
 - Browser Rendering（浏览器渲染）
-- AI Gateway（可选，用于 API 路由/分析）
-- R2 Storage（可选，用于持久化）
+- AI Gateway（API 路由/分析）
+- R2 Storage（用于持久化）
 
 ## 容器费用估算
 
-本项目使用 `standard-1` Cloudflare Container 实例（1/2 vCPU，4 GiB 内存，8 GB 磁盘）。以下是按容器 24/7 运行估算的月成本（参考 [Cloudflare Containers 定价](https://developers.cloudflare.com/containers/pricing/)）：
+本项目当前默认使用 `standard-2` Cloudflare Container 实例以提升性能。下表仍以 `standard-1` 为 24/7 运行的粗略成本参考（`standard-2` 以 Cloudflare 实时报价为准，见 [Cloudflare Containers 定价](https://developers.cloudflare.com/containers/pricing/)）：
 
 | 资源 | 预配置 | 月使用量 | 免费额度 | 超出部分 | 估算费用 |
 |------|--------|----------|----------|----------|----------|
@@ -233,9 +233,11 @@ R2 使用“备份/恢复”方式实现持久化：
 
 ## 容器生命周期
 
-默认 `SANDBOX_SLEEP_AFTER=never`，容器会常驻（推荐，因为冷启动约 1-2 分钟）。
+本仓库默认在 `wrangler.jsonc` 中配置 `SANDBOX_SLEEP_AFTER=24h`，以尽量保持容器热态、减少冷启动。
 
-若想降低低频使用场景成本，可配置空闲休眠时间：
+默认 cron 预热频率为每 5 分钟一次（`*/5 * * * *`），用于降低首次请求延迟。
+
+若想降低低频使用场景成本，可缩短休眠时间（或改为 `never` 以持续常驻）：
 
 ```bash
 npx wrangler secret put SANDBOX_SLEEP_AFTER
