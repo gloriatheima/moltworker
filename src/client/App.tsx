@@ -5,8 +5,8 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <img src="/logo-small.png" alt="openclaw-worker" className="header-logo" />
-        <h1>openclaw admin</h1>
+        <img src="/logo.png" alt="OpenClaw Worker" className="header-logo" />
+        <h1>OpenClaw Admin</h1>
       </header>
       <main className="app-main">
         <AdminPage />
